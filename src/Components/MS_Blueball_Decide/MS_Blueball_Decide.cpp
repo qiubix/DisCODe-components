@@ -40,12 +40,21 @@ bool MS_Blueball_Decide::onInit()
 	h_onNewBlobs.setup(this, &MS_Blueball_Decide::onNewBlobs);
 	registerHandler("onNewBlobs", &h_onNewBlobs);
 
+	h_onNewCameraInfo.setup(this, &MS_Blueball_Decide::onNewCameraInfo);
+	registerHandler("onNewCameraInfo", &h_onNewCameraInfo);
+
+	// Register input streams.
 	registerStream("in_blobs", &in_blobs);
 	registerStream("in_hue", &in_hue);
+	registerStream("in_cameraInfo", &in_cameraInfo);
 
+	found = registerEvent("Found");
+	notFound = registerEvent("NotFound");
 	newImage = registerEvent("newImage");
 
+	// Register output streams.
 	registerStream("out_balls", &out_balls);
+	registerStream("out_imagePosition", &out_imagePosition);
 
 	return true;
 }
@@ -66,48 +75,54 @@ bool MS_Blueball_Decide::onStep()
 	try {
 		int id = 0;
 		int i;
-		Types::Blobs::Blob *currentBlob;
+		Types::Blobs::Blob currentBlob;
 		Types::DrawableContainer Blueballs;
+		// Check whether there is any blue blob detected.
 
-		// iterate through all found blobs
-		for (i = 0; i < blobs.GetNumBlobs(); i++ )
-		{
-			currentBlob = blobs.GetBlob(i);
+		if (blobs.GetNumBlobs() <0) {
+			LOG(LTRACE) << "Blue blob not found.\n";
 
-//			// get mean color from area coverd by blob (from hue component)
-//			double me = currentBlob->Mean(&h);
-//			double st = currentBlob->StdDev(&h);
-
-			// get blob bounding rectangle and ellipse
-			CvBox2D r2 = currentBlob->GetEllipse();
-
-//			// blob moments
-//			double m00, m10, m01, m11, m02, m20;
-//			double M11, M02, M20, M7;
-//
-//			// calculate moments
-//			m00 = currentBlob->Moment(0,0);
-//			m01 = currentBlob->Moment(0,1);
-//			m10 = currentBlob->Moment(1,0);
-//			m11 = currentBlob->Moment(1,1);
-//			m02 = currentBlob->Moment(0,2);
-//			m20 = currentBlob->Moment(2,0);
-//
-//			M11 = m11 - (m10*m01)/m00;
-//			M02 = m02 - (m01*m01)/m00;
-//			M20 = m20 - (m10*m10)/m00;
-//
-//			// for circle it should be ~0.0063
-//			M7 = (M20*M02-M11*M11) / (m00*m00*m00*m00);
-
-			std::cout << "Center: " << r2.center.x << "," << r2.center.y << "\n";
-			++id;
-
-			Blueballs.add(new Types::Ellipse(Point(r2.center.x, r2.center.y), Size(r2.size.width, r2.size.height), r2.angle));
+			// Disregarding the fact - write output stream.
+			out_balls.write(Blueballs);
+			// Raise events.
+			notFound->raise();
+			newImage->raise();
+			return true;
 		}
 
+		blobs.GetNthBlob(Types::Blobs::BlobGetArea(), 0, currentBlob);
+
+
+		// get blob bounding rectangle and ellipse
+		CvBox2D r2 = currentBlob.GetEllipse();
+
+		std::cout << "Center: " << r2.center.x << "," << r2.center.y << "\n";
+		++id;
+
+		Types::Ellipse* tmpball = new Types::Ellipse(Point(r2.center.x, r2.center.y), Size(r2.size.width, r2.size.height), r2.angle);
+
+		// Add to list.
+		Blueballs.add(tmpball);
+
+		// Write blueball list to stream.
 		out_balls.write(Blueballs);
 
+
+
+		Types::ImagePosition imagePosition;
+		double maxPixels = std::max(cameraInfo.size().width, cameraInfo.size().height);
+		// Change coordinate system hence it will return coordinates from (-1,1), center is 0.
+		imagePosition.elements[0] = (r2.center.x - cameraInfo.size().width / 2) / maxPixels;
+		imagePosition.elements[1] = (r2.center.y - cameraInfo.size().height / 2) / maxPixels;
+		// Size-related coordinate.
+		imagePosition.elements[2] = 0;
+		// Rotation - in case of blueball - zero.
+		imagePosition.elements[3] = 0;
+
+		// Write to stream.
+		out_imagePosition.write(imagePosition);
+		// Raise events.
+		found->raise();
 		newImage->raise();
 
 		return true;
@@ -143,6 +158,14 @@ void MS_Blueball_Decide::onNewBlobs()
 	LOG(LTRACE) << "MS_Blueball_Decide::onNewBlobs\n";
 
 	blobs = in_blobs.read();
+	onStep();
+}
+
+void MS_Blueball_Decide::onNewCameraInfo()
+{
+	LOG(LTRACE) << "MS_Blueball_Decide::onNewCameraInfo\n";
+
+	cameraInfo = in_cameraInfo.read();
 	onStep();
 }
 

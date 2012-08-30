@@ -21,6 +21,8 @@
 
 #include "Types/BlobResult.hpp"
 #include "Types/DrawableContainer.hpp"
+#include "Types/ImagePosition.hpp"
+#include "Types/CameraInfo.hpp"
 
 namespace Processors {
 namespace MS_Blueball {
@@ -108,7 +110,6 @@ protected:
 	/// New image is waiting
 	Base::EventHandler <MS_Blueball_Decide> h_onNewImage;
 
-
 	/*!
 	 * Event handler function.
 	 */
@@ -117,6 +118,11 @@ protected:
 	/// New set of blobs is waiting
 	Base::EventHandler <MS_Blueball_Decide> h_onNewBlobs;
 
+	/// Event handler function.
+	void onNewCameraInfo();
+
+	/// New camera info is waiting.
+	Base::EventHandler <MS_Blueball_Decide> h_onNewCameraInfo;
 
 	/// Input blobs
 	Base::DataStreamIn <Types::Blobs::BlobResult> in_blobs;
@@ -124,11 +130,23 @@ protected:
 	/// Input hue image
 	Base::DataStreamIn <cv::Mat> in_hue;
 
+	/// Input data stream containing camera properties.
+	Base::DataStreamIn <Types::CameraInfo> in_cameraInfo;
+
 	/// Event raised, when data is processed
 	Base::Event * newImage;
 
 	/// Output data stream - list of ellipses around found Blueballs
 	Base::DataStreamOut < Types::DrawableContainer > out_balls;
+
+	/// Position of the blueball in image coordinates.
+	Base::DataStreamOut <Types::ImagePosition> out_imagePosition;
+
+	/// Raised when object has been located on the image.
+	Base::Event *found;
+
+	/// Raised when object has not been located on the image.
+	Base::Event *notFound;
 
 	/// Properties
 	Props props;
@@ -141,6 +159,9 @@ private:
 	bool hue_ready;
 
 	Types::Blobs::BlobResult blobs;
+
+	// Data related to the utilized camera.
+	Types::CameraInfo cameraInfo;
 };
 
 }//: namespace MS_Blueball
