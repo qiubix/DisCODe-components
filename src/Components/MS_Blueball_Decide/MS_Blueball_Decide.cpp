@@ -96,8 +96,30 @@ bool MS_Blueball_Decide::onStep()
 		// get blob bounding rectangle and ellipse
 		CvBox2D r2 = currentBlob.GetEllipse();
 
-		std::cout << "Center: " << r2.center.x << "," << r2.center.y << "\n";
+		//std::cout << "Center: " << r2.center.x << "," << r2.center.y << "\n";
 		++id;
+
+		// blob moments
+		double m00, m10, m01, m11, m02, m20;
+		double M11, M02, M20, M7, a, b, wsp_elips;
+
+		// calculate moments
+		m00 = currentBlob.Moment(0,0);
+		m01 = currentBlob.Moment(0,1);
+		m10 = currentBlob.Moment(1,0);
+		m11 = currentBlob.Moment(1,1);
+		m02 = currentBlob.Moment(0,2);
+		m20 = currentBlob.Moment(2,0);
+
+		M11 = m11 - (m10*m01)/m00;
+		M02 = m02 - (m01*m01)/m00;
+		M20 = m20 - (m10*m10)/m00;
+		// for circle it should be ~0.0063
+		M7 = (M20*M02-M11*M11) / (m00*m00*m00*m00);
+
+		a=sqrt(2*(M20+M02+sqrt(M11*M11+(M20-M02)*(M20-M02))));
+		b=sqrt(2*(M20+M02-sqrt(M11*M11+(M20-M02)*(M20-M02))));
+		wsp_elips=b/a;
 
 		Types::Ellipse* tmpball = new Types::Ellipse(Point(r2.center.x, r2.center.y), Size(r2.size.width, r2.size.height), r2.angle);
 
@@ -106,18 +128,19 @@ bool MS_Blueball_Decide::onStep()
 
 		// Write blueball list to stream.
 		out_balls.write(Blueballs);
+			
 
-
-
-		Types::ImagePosition imagePosition;
 		double maxPixels = std::max(cameraInfo.size().width, cameraInfo.size().height);
+		double diameter=std::max(r2.size.width, r2.size.height)/maxPixels;
+		Types::ImagePosition imagePosition;
+		std::cout << "Srednica: " <<  std::max(r2.size.width, r2.size.height)<<std::endl;
 		// Change coordinate system hence it will return coordinates from (-1,1), center is 0.
 		imagePosition.elements[0] = (r2.center.x - cameraInfo.size().width / 2) / maxPixels;
 		imagePosition.elements[1] = (r2.center.y - cameraInfo.size().height / 2) / maxPixels;
-		// Size-related coordinate.
-		imagePosition.elements[2] = 0;
+		// Elipse factor
+		imagePosition.elements[2] = diameter;
 		// Rotation - in case of blueball - zero.
-		imagePosition.elements[3] = 0;
+		imagePosition.elements[3] = wsp_elips;
 
 		// Write to stream.
 		out_imagePosition.write(imagePosition);
