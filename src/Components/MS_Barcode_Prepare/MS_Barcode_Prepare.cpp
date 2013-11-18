@@ -27,32 +27,37 @@ MS_Barcode_Prepare::~MS_Barcode_Prepare()
 	LOG(LTRACE) << "Good bye MS_Barcode_Prepare\n";
 }
 
+void MS_Barcode_Prepare::prepareInterface()
+{
+
+    LOG(LTRACE) << "MS_Barcode_Prepare::initialize\n";
+
+    h_onNewImage1.setup(this, &MS_Barcode_Prepare::onNewImage1);
+    registerHandler("onNewImage1", &h_onNewImage1);
+
+    h_onNewImage2.setup(this, &MS_Barcode_Prepare::onNewImage2);
+    registerHandler("onNewImage2", &h_onNewImage2);
+
+    h_onNewImage3.setup(this, &MS_Barcode_Prepare::onNewImage3);
+    registerHandler("onNewImage3", &h_onNewImage3);
+
+    h_onNewImage4.setup(this, &MS_Barcode_Prepare::onNewImage4);
+    registerHandler("onNewImage4", &h_onNewImage4);
+
+    registerStream("in_img1", &in_img1);
+    registerStream("in_img2", &in_img2);
+    registerStream("in_img3", &in_img3);
+    registerStream("in_img4", &in_img4);
+
+//	newImage = registerEvent("newImage");
+
+    registerStream("out_img", &out_img);
+
+}
+
 bool MS_Barcode_Prepare::onInit()
 {
-	LOG(LTRACE) << "MS_Barcode_Prepare::initialize\n";
-
-	h_onNewImage1.setup(this, &MS_Barcode_Prepare::onNewImage1);
-	registerHandler("onNewImage1", &h_onNewImage1);
-
-	h_onNewImage2.setup(this, &MS_Barcode_Prepare::onNewImage2);
-	registerHandler("onNewImage2", &h_onNewImage2);
-
-	h_onNewImage3.setup(this, &MS_Barcode_Prepare::onNewImage3);
-	registerHandler("onNewImage3", &h_onNewImage3);
-
-	h_onNewImage4.setup(this, &MS_Barcode_Prepare::onNewImage4);
-	registerHandler("onNewImage4", &h_onNewImage4);
-
-	registerStream("in_img1", &in_img1);
-	registerStream("in_img2", &in_img2);
-	registerStream("in_img3", &in_img3);
-	registerStream("in_img4", &in_img4);
-
-	newImage = registerEvent("newImage");
-
-	registerStream("out_img", &out_img);
-
-	return true;
+        return true;
 }
 
 bool MS_Barcode_Prepare::onFinish()
@@ -72,7 +77,7 @@ bool MS_Barcode_Prepare::onStep()
 	//cv::normalize(sum, sum, 1.0, 0.0, CV_C);
 
 	out_img.write(sum);
-	newImage->raise();
+    //newImage->raise();
 
 	return true;
 }

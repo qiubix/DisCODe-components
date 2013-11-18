@@ -10,11 +10,11 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
+//#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Props.hpp"
 
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <highgui.h>
 
 #include <vector>
@@ -72,6 +72,8 @@ public:
 		return &props;
 	}
 
+    void prepareInterface();
+
 protected:
 
 	/*!
@@ -125,7 +127,7 @@ protected:
 	Base::DataStreamIn <cv::Mat> in_hue;
 
 	/// Event raised, when data is processed
-	Base::Event * newImage;
+//	Base::Event * newImage;
 
 	/// Output data stream - list of ellipses around found signs
 	Base::DataStreamOut < Types::DrawableContainer > out_signs;
@@ -150,7 +152,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("MS_Sign_Decide", Processors::MS_Sign::MS_Sign_Decide, Common::Panel_Empty)
+REGISTER_COMPONENT("MS_Sign_Decide", Processors::MS_Sign::MS_Sign_Decide)
 
 #endif /* MS_SIGN_DECIDE_HPP_ */
 

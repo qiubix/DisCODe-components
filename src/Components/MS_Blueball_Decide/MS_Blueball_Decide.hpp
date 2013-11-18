@@ -10,11 +10,11 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
+//#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Props.hpp"
 
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <highgui.h>
 
 #include <vector>
@@ -73,6 +73,8 @@ public:
 	{
 		return &props;
 	}
+
+    void prepareInterface();
 
 protected:
 
@@ -134,7 +136,7 @@ protected:
 	Base::DataStreamIn <Types::CameraInfo> in_cameraInfo;
 
 	/// Event raised, when data is processed
-	Base::Event * newImage;
+//	Base::Event * newImage;
 
 	/// Output data stream - list of ellipses around found Blueballs
 	Base::DataStreamOut < Types::DrawableContainer > out_balls;
@@ -143,10 +145,10 @@ protected:
 	Base::DataStreamOut <Types::ImagePosition> out_imagePosition;
 
 	/// Raised when object has been located on the image.
-	Base::Event *found;
+    //Base::Event *found;
 
 	/// Raised when object has not been located on the image.
-	Base::Event *notFound;
+    //Base::Event *notFound;
 
 	/// Properties
 	Props props;
@@ -171,7 +173,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("MS_Blueball_Decide", Processors::MS_Blueball::MS_Blueball_Decide, Common::Panel_Empty)
+REGISTER_COMPONENT("MS_Blueball_Decide", Processors::MS_Blueball::MS_Blueball_Decide)
 
 #endif /* MS_BLUEBALL_DECIDE_HPP_ */
 

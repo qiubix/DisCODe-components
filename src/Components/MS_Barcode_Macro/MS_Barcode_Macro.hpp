@@ -10,11 +10,12 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
+//#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
-#include "Props.hpp"
+//#include "Props.hpp"
+#include "Property.hpp"
 
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <highgui.h>
 
 #include <vector>
@@ -42,7 +43,7 @@ struct Props: public Base::Props
 	/*!
 	 * \copydoc Base::Props::load
 	 */
-	void load(const ptree & pt)
+    void load(const ptree & pt)
 	{
 		kernel_1 = str2mat(cv::Size(3,3), pt.get("kernel_1", ""), 1);
 		kernel_2 = str2mat(cv::Size(3,3), pt.get("kernel_2", ""), 1);
@@ -58,7 +59,7 @@ struct Props: public Base::Props
 	/*!
 	 * \copydoc Base::Props::save
 	 */
-	void save(ptree & pt)
+    void save(ptree & pt)
 	{
 	}
 
@@ -102,10 +103,12 @@ public:
 	/*!
 	 * Return window properties
 	 */
-	Base::Props * getProperties()
+    Base::Property * getProperties()
 	{
 		return &props;
 	}
+
+    void prepareInterface();
 
 protected:
 
@@ -147,7 +150,7 @@ protected:
 	Base::DataStreamIn <cv::Mat, Base::DataStreamBuffer::Newest> in_img;
 
 	/// Event raised, when data is processed
-	Base::Event * newImage;
+//	Base::Event * newImage;
 
 	/// Output image
 	Base::DataStreamOut < cv::Mat > out_img;
@@ -159,7 +162,7 @@ protected:
 	Base::DataStreamOut < cv::Mat > out_sfe2;
 
 	/// Properties
-	Props props;
+    Props props;
 
 private:
 	cv::Mat sf;
@@ -173,7 +176,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("MS_Barcode_Macro", Processors::MS_Barcode::MS_Barcode_Macro, Common::Panel_Empty)
+REGISTER_COMPONENT("MS_Barcode_Macro", Processors::MS_Barcode::MS_Barcode_Macro)
 
 #endif /* MS_BARCODE_MACRO_HPP_ */
 

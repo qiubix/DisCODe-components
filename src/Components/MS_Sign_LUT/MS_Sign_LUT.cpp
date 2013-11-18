@@ -48,21 +48,26 @@ MS_Sign_LUT::~MS_Sign_LUT()
 	LOG(LTRACE) << "Good bye MS_Sign_LUT\n";
 }
 
+void MS_Sign_LUT::prepareInterface()
+{
+
+    LOG(LTRACE) << "MS_Sign_LUT::initialize\n";
+
+    h_onNewImage.setup(this, &MS_Sign_LUT::onNewImage);
+    registerHandler("onNewImage", &h_onNewImage);
+
+    registerStream("in_img", &in_img);
+
+    //newImage = registerEvent("newImage");
+
+    registerStream("out_hue", &out_hue);
+    registerStream("out_segments", &out_segments);
+
+}
+
 bool MS_Sign_LUT::onInit()
 {
-	LOG(LTRACE) << "MS_Sign_LUT::initialize\n";
-
-	h_onNewImage.setup(this, &MS_Sign_LUT::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	registerStream("in_img", &in_img);
-
-	newImage = registerEvent("newImage");
-
-	registerStream("out_hue", &out_hue);
-	registerStream("out_segments", &out_segments);
-
-	return true;
+        return true;
 }
 
 bool MS_Sign_LUT::onFinish()
@@ -166,7 +171,7 @@ void MS_Sign_LUT::onNewImage()
 		out_hue.write(hue_img);
 		out_segments.write(segments);
 
-		newImage->raise();
+        //newImage->raise();
 	}
 	catch (Common::DisCODeException& ex) {
 		LOG(LERROR) << ex.what() << "\n";

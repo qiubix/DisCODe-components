@@ -26,26 +26,31 @@ MS_Barcode_Macro::~MS_Barcode_Macro()
 	LOG(LTRACE) << "Good bye MS_Barcode_Macro\n";
 }
 
+void MS_Barcode_Macro::prepareInterface()
+{
+
+    LOG(LTRACE) << "MS_Barcode_Macro::initialize\n";
+
+    h_onNewImage.setup(this, &MS_Barcode_Macro::onNewImage);
+    registerHandler("onNewImage", &h_onNewImage);
+
+    registerStream("in_img", &in_img);
+
+//	newImage = registerEvent("newImage");
+
+    registerStream("out_img", &out_img);
+
+    registerStream("out_sf1", &out_sf1);
+    registerStream("out_sfe1", &out_sfe1);
+
+    registerStream("out_sf2", &out_sf2);
+    registerStream("out_sfe2", &out_sfe2);
+
+}
+
 bool MS_Barcode_Macro::onInit()
 {
-	LOG(LTRACE) << "MS_Barcode_Macro::initialize\n";
-
-	h_onNewImage.setup(this, &MS_Barcode_Macro::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	registerStream("in_img", &in_img);
-
-	newImage = registerEvent("newImage");
-
-	registerStream("out_img", &out_img);
-
-	registerStream("out_sf1", &out_sf1);
-	registerStream("out_sfe1", &out_sfe1);
-
-	registerStream("out_sf2", &out_sf2);
-	registerStream("out_sfe2", &out_sfe2);
-
-	return true;
+        return true;
 }
 
 bool MS_Barcode_Macro::onFinish()
@@ -120,7 +125,7 @@ void MS_Barcode_Macro::onNewImage()
 	out_sfe2.write(sfe2);
 
 	out_img.write(sf.clone());
-	newImage->raise();
+    //newImage->raise();
 }
 
 

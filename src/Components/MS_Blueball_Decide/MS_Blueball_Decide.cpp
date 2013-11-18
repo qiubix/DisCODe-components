@@ -30,33 +30,38 @@ MS_Blueball_Decide::~MS_Blueball_Decide()
 	LOG(LTRACE) << "Good bye MS_Blueball_Decide\n";
 }
 
+void MS_Blueball_Decide::prepareInterface()
+{
+
+    LOG(LTRACE) << "MS_Blueball_Decide::initialize\n";
+
+    h_onNewImage.setup(this, &MS_Blueball_Decide::onNewImage);
+    registerHandler("onNewImage", &h_onNewImage);
+
+    h_onNewBlobs.setup(this, &MS_Blueball_Decide::onNewBlobs);
+    registerHandler("onNewBlobs", &h_onNewBlobs);
+
+    h_onNewCameraInfo.setup(this, &MS_Blueball_Decide::onNewCameraInfo);
+    registerHandler("onNewCameraInfo", &h_onNewCameraInfo);
+
+    // Register input streams.
+    registerStream("in_blobs", &in_blobs);
+    registerStream("in_hue", &in_hue);
+    registerStream("in_cameraInfo", &in_cameraInfo);
+
+//	found = registerEvent("Found");
+    //notFound = registerEvent("NotFound");
+    //newImage = registerEvent("newImage");
+
+    // Register output streams.
+    registerStream("out_balls", &out_balls);
+    registerStream("out_imagePosition", &out_imagePosition);
+
+}
+
 bool MS_Blueball_Decide::onInit()
 {
-	LOG(LTRACE) << "MS_Blueball_Decide::initialize\n";
-
-	h_onNewImage.setup(this, &MS_Blueball_Decide::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	h_onNewBlobs.setup(this, &MS_Blueball_Decide::onNewBlobs);
-	registerHandler("onNewBlobs", &h_onNewBlobs);
-
-	h_onNewCameraInfo.setup(this, &MS_Blueball_Decide::onNewCameraInfo);
-	registerHandler("onNewCameraInfo", &h_onNewCameraInfo);
-
-	// Register input streams.
-	registerStream("in_blobs", &in_blobs);
-	registerStream("in_hue", &in_hue);
-	registerStream("in_cameraInfo", &in_cameraInfo);
-
-	found = registerEvent("Found");
-	notFound = registerEvent("NotFound");
-	newImage = registerEvent("newImage");
-
-	// Register output streams.
-	registerStream("out_balls", &out_balls);
-	registerStream("out_imagePosition", &out_imagePosition);
-
-	return true;
+        return true;
 }
 
 bool MS_Blueball_Decide::onFinish()
@@ -85,8 +90,8 @@ bool MS_Blueball_Decide::onStep()
 			// Disregarding the fact - write output stream.
 			out_balls.write(Blueballs);
 			// Raise events.
-			notFound->raise();
-			newImage->raise();
+            //notFound->raise();
+            //newImage->raise();
 			return true;
 		}
 
@@ -145,8 +150,8 @@ bool MS_Blueball_Decide::onStep()
 		// Write to stream.
 		out_imagePosition.write(imagePosition);
 		// Raise events.
-		found->raise();
-		newImage->raise();
+        //found->raise();
+        //newImage->raise();
 
 		return true;
 	} catch (...) {

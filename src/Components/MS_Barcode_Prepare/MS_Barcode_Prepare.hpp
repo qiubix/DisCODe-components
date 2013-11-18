@@ -10,11 +10,11 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
+//#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 #include "Props.hpp"
 
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <highgui.h>
 
 #include <vector>
@@ -94,6 +94,8 @@ public:
 		return &props;
 	}
 
+    void prepareInterface();
+
 protected:
 
 	/*!
@@ -137,7 +139,7 @@ protected:
 	Base::EventHandler <MS_Barcode_Prepare> h_onNewImage4;
 
 	/// Event raised, when data is processed
-	Base::Event * newImage;
+    //Base::Event * newImage;
 
 	/// Output image
 	Base::DataStreamOut < cv::Mat > out_img;
@@ -165,6 +167,6 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("MS_Barcode_Prepare", Processors::MS_Barcode::MS_Barcode_Prepare, Common::Panel_Empty)
+REGISTER_COMPONENT("MS_Barcode_Prepare", Processors::MS_Barcode::MS_Barcode_Prepare)
 
 #endif /* MS_BARCODE_PREPARE_HPP_ */

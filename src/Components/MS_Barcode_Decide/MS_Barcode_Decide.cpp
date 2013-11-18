@@ -27,24 +27,29 @@ MS_Barcode_Decide::~MS_Barcode_Decide()
 	LOG(LTRACE) << "Good bye MS_Barcode_Decide\n";
 }
 
+void MS_Barcode_Decide::prepareInterface()
+{
+
+    LOG(LTRACE) << "MS_Barcode_Decide::initialize\n";
+
+    h_onNewImage.setup(this, &MS_Barcode_Decide::onNewImage);
+    registerHandler("onNewImage", &h_onNewImage);
+
+    h_onNewBlobs.setup(this, &MS_Barcode_Decide::onNewBlobs);
+    registerHandler("onNewBlobs", &h_onNewBlobs);
+
+    registerStream("in_blobs", &in_blobs);
+    registerStream("in_hue", &in_hue);
+
+//	newImage = registerEvent("newImage");
+
+    registerStream("out_signs", &out_signs);
+
+}
+
 bool MS_Barcode_Decide::onInit()
 {
-	LOG(LTRACE) << "MS_Barcode_Decide::initialize\n";
-
-	h_onNewImage.setup(this, &MS_Barcode_Decide::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	h_onNewBlobs.setup(this, &MS_Barcode_Decide::onNewBlobs);
-	registerHandler("onNewBlobs", &h_onNewBlobs);
-
-	registerStream("in_blobs", &in_blobs);
-	registerStream("in_hue", &in_hue);
-
-	newImage = registerEvent("newImage");
-
-	registerStream("out_signs", &out_signs);
-
-	return true;
+        return true;
 }
 
 bool MS_Barcode_Decide::onFinish()
@@ -83,7 +88,7 @@ bool MS_Barcode_Decide::onStep()
 
 		out_signs.write(signs);
 
-		newImage->raise();
+        //newImage->raise();
 
 		return true;
 	} catch (...) {

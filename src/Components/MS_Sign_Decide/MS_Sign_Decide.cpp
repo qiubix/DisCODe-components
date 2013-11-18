@@ -30,24 +30,29 @@ MS_Sign_Decide::~MS_Sign_Decide()
 	LOG(LTRACE) << "Good bye MS_Sign_Decide\n";
 }
 
+void MS_Sign_Decide::prepareInterface()
+{
+
+    LOG(LTRACE) << "MS_Sign_Decide::initialize\n";
+
+    h_onNewImage.setup(this, &MS_Sign_Decide::onNewImage);
+    registerHandler("onNewImage", &h_onNewImage);
+
+    h_onNewBlobs.setup(this, &MS_Sign_Decide::onNewBlobs);
+    registerHandler("onNewBlobs", &h_onNewBlobs);
+
+    registerStream("in_blobs", &in_blobs);
+    registerStream("in_hue", &in_hue);
+
+//    newImage = registerEvent("newImage");
+
+    registerStream("out_signs", &out_signs);
+
+}
+
 bool MS_Sign_Decide::onInit()
 {
-	LOG(LTRACE) << "MS_Sign_Decide::initialize\n";
-
-	h_onNewImage.setup(this, &MS_Sign_Decide::onNewImage);
-	registerHandler("onNewImage", &h_onNewImage);
-
-	h_onNewBlobs.setup(this, &MS_Sign_Decide::onNewBlobs);
-	registerHandler("onNewBlobs", &h_onNewBlobs);
-
-	registerStream("in_blobs", &in_blobs);
-	registerStream("in_hue", &in_hue);
-
-	newImage = registerEvent("newImage");
-
-	registerStream("out_signs", &out_signs);
-
-	return true;
+        return true;
 }
 
 bool MS_Sign_Decide::onFinish()
@@ -128,7 +133,7 @@ bool MS_Sign_Decide::onStep()
 
 		out_signs.write(signs);
 
-		newImage->raise();
+        //newImage->raise();
 
 		return true;
 	} catch (...) {

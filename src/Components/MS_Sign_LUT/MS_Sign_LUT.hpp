@@ -10,12 +10,12 @@
 
 #include "Component_Aux.hpp"
 #include "Component.hpp"
-#include "Panel_Empty.hpp"
+//#include "Panel_Empty.hpp"
 #include "DataStream.hpp"
 
 #include "Property.hpp"
 
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <highgui.h>
 
 namespace Processors {
@@ -40,6 +40,7 @@ public:
 	 */
 	virtual ~MS_Sign_LUT();
 
+        void prepareInterface();
 
 protected:
 
@@ -81,7 +82,7 @@ protected:
 	Base::DataStreamIn <Mat> in_img;
 
 	/// Event raised, when image is processed
-	Base::Event * newImage;
+    //Base::Event * newImage;
 
 	/// Output data stream - hue part with continous red
 	Base::DataStreamOut <Mat> out_hue;
@@ -106,7 +107,7 @@ private:
 /*
  * Register processor component.
  */
-REGISTER_PROCESSOR_COMPONENT("MS_Sign_LUT", Processors::MS_Sign::MS_Sign_LUT, Common::Panel_Empty)
+REGISTER_COMPONENT("MS_Sign_LUT", Processors::MS_Sign::MS_Sign_LUT)
 
 #endif /* MS_SIGN_LUT_HPP_ */
 
